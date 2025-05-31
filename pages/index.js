@@ -1,5 +1,3 @@
-// pages/index.js
-// ... existing imports ...
 import CandlestickChart from '../components/CandlestickChart';
 
 // Inside your component:

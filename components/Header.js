@@ -1,4 +1,3 @@
-// ✅ money-matrix/components/Header.js
 export default function Header() {
   return (
     <header className="bg-gradient-to-r from-blue-700 to-blue-500 p-4 shadow-md text-white">

@@ -1,4 +1,3 @@
-// ✅ money-matrix/pages/api/quote.js
 export default async function handler(req, res) {
   const { symbol } = req.query;
   const apiKey = process.env.ALPHA_VANTAGE_API_KEY;

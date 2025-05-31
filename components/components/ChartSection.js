@@ -1,127 +1,39 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import CandlestickChart from '../components/CandlestickChart';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-export default function ChartSection({ data }) {
-  const [chartData, setChartData] = useState(null);
-  const chartRef = useRef(null);
-
-  useEffect(() => {
-    if (!data || !data['Time Series (Daily)']) {
-      setChartData(null);
-      return;
-    }
-
-    try {
-      const series = data['Time Series (Daily)'];
-      const dates = Object.keys(series).reverse().slice(0, 30); // Last 30 days
-      const closingPrices = dates.map(date => parseFloat(series[date]['4. close']));
-
-      setChartData({
-        labels: dates,
-        datasets: [
-          {
-            label: 'Closing Price',
-            data: closingPrices,
-            borderColor: 'rgb(59, 130, 246)',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-            tension: 0.3,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgb(59, 130, 246)',
-            fill: true
-          }
-        ]
-      });
-    } catch (error) {
-      console.error('Error processing chart data:', error);
-      setChartData(null);
-    }
-  }, [data]);
-
-  if (!chartData) {
-    return (
-      <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-        <h3 className="text-xl font-semibold mb-4">Price Chart</h3>
-        <div className="h-64 flex items-center justify-center text-gray-500">
-          {data ? 'Error loading chart data' : 'Select a stock to view chart'}
+// Inside your component:
+{selectedStock && (
+  <div className="bg-slate-800 rounded-xl p-6 mb-8 border border-slate-700">
+    {/* Stock info header */}
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+      <div>
+        <h2 className="text-2xl font-bold">{selectedStock.symbol}</h2>
+        <p className="text-slate-400">{selectedStock.name}</p>
+      </div>
+      
+      {quoteData?.GlobalQuote && (
+        <div className="mt-4 md:mt-0 text-right">
+          <div className="text-3xl font-bold">
+            ${parseFloat(quoteData.GlobalQuote['05. price']).toFixed(2)}
+          </div>
+          <div className={`text-lg ${parseFloat(quoteData.GlobalQuote['10. change percent'].replace('%', '')) >= 0 
+            ? 'text-green-500' : 'text-red-500'}`}>
+            {quoteData.GlobalQuote['09. change']} ({quoteData.GlobalQuote['10. change percent']})
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-slate-800 p-6 rounded-xl border border-slate-700">
-      <h3 className="text-xl font-semibold mb-4">Price Chart (30 Days)</h3>
-      <div className="h-64">
-        <Line
-          ref={chartRef}
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: 'rgba(30, 41, 59, 0.9)',
-                titleColor: '#93c5fd',
-                bodyColor: '#f8fafc',
-                borderColor: '#1e293b',
-                borderWidth: 1,
-                padding: 12,
-                callbacks: {
-                  label: (context) => `$${context.parsed.y.toFixed(2)}`
-                }
-              }
-            },
-            scales: {
-              x: {
-                grid: {
-                  display: false
-                },
-                ticks: {
-                  color: '#94a3b8',
-                  maxRotation: 0,
-                  autoSkip: true,
-                  maxTicksLimit: 10
-                }
-              },
-              y: {
-                grid: {
-                  color: 'rgba(148, 163, 184, 0.1)'
-                },
-                ticks: {
-                  color: '#94a3b8',
-                  callback: (value) => `$${value}`
-                }
-              }
-            }
-          }}
-        />
-      </div>
+      )}
     </div>
-  );
-}
+    
+    {/* Replace ChartSection with CandlestickChart */}
+    <CandlestickChart data={dailyData} />
+    
+    {/* Volume indicator */}
+    <div className="mt-4 text-sm text-slate-400">
+      {dailyData?.['Meta Data'] && (
+        <div>
+          Last Updated: {dailyData['Meta Data']['3. Last Refreshed']} | 
+          Time Zone: {dailyData['Meta Data']['5. Time Zone']}
+        </div>
+      )}
+    </div>
+  </div>
+)}

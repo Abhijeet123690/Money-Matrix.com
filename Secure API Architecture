@@ -1,0 +1,1 @@
+fetch(`https://www.alphavantage.co/query?...&apikey=...`);
